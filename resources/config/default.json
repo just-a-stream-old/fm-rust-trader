@@ -1,0 +1,8 @@
+{
+  "engine": {
+    "starting_cash": 10000,
+    "symbols": ["ETH-USD"],
+    "timeframes": ["1D"],
+    "exchanges": ["BINANCE"]
+  }
+}

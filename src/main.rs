@@ -1,3 +1,10 @@
+mod config;
+
+use crate::config::*;
+
 fn main() {
-    println!("Hello World!")
+    let config = load_config();
+
+    println!("{:#?}", config);
+
 }
