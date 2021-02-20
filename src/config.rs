@@ -3,15 +3,14 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::Read;
 use serde::{Serialize, Deserialize};
-use serde_json::Result;
 
 const ACTIVE_PROFILE: &str = "ACTIVE_PROFILE";
-const DIRECTORY: &str = "resources/config/";
+const CONFIG_DIRECTORY: &str = "resources/config/";
 
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    engine: Engine
+    engine: Engine,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -19,11 +18,13 @@ pub struct Engine {
     starting_cash:  f64,
     symbols:        Vec<String>,
     timeframes:     Vec<String>,
-    exchanges:      Vec<String>
+    exchanges:      Vec<String>,
 }
 
 pub fn load_config() -> Config {
-    // Todo: Add validation function for the passed config
+    // Todo:
+    //  - Add validation function for the passed config
+    //  - Do I return a Result<Config> or not? Handle errors or propagate with '?' ?
 
     // Extract ACTIVE_PROFILE environment variable
     let active_profile = match env::var(ACTIVE_PROFILE) {
@@ -32,7 +33,7 @@ pub fn load_config() -> Config {
     };
 
     // Open config file & use to create a buffered reader
-    let file_path = format!("{}{}{}", DIRECTORY, active_profile, ".json");
+    let file_path = format!("{}{}{}", CONFIG_DIRECTORY, active_profile, ".json");
     let mut reader = match File::open(file_path) {
         // Ok(file) => file,
         Ok(config_file) => BufReader::new(config_file),
@@ -49,7 +50,7 @@ pub fn load_config() -> Config {
     // Map config json String to Config struct & return Result<Config>
     let config: Config = match serde_json::from_str(&*config_contents) {
         Ok(config) => config,
-        Err(err) => panic!("failed to init environment config: {}", err)
+        Err(err) => panic!("failed to map config file contents to Config struct: {}", err)
     };
 
     return config;
