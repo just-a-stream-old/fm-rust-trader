@@ -32,7 +32,7 @@ pub struct Bar {
 }
 
 // SymbolData represents a symbol's struct of market data arrays (OHLCV) and associated indicators values
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SymbolData {
     pub timestamps: Vec<NaiveDate>,
     pub opens: Vec<f64>,
@@ -41,14 +41,6 @@ pub struct SymbolData {
     pub closes: Vec<f64>,
     pub volumes: Vec<f64>,
     pub indicators: HashMap<String, Vec<f64>>,
-}
-
-impl Default for SymbolData {
-    fn default() -> SymbolData {
-        SymbolData{
-            timestamps: vec![], opens: vec![], highs: vec![], lows: vec![],
-            closes: vec![], volumes: vec![], indicators: Default::default()}
-    }
 }
 
 impl SymbolData {

@@ -6,7 +6,7 @@ const DATA_DIRECTORY: &str = "resources/data/";
 pub struct HistoricDataHandler {
     event_q:                Vec<MarketEvent>,
     symbol:                 String,
-    all_symbol_data:        SymbolData,
+    pub(crate) all_symbol_data:        SymbolData,
     current_symbol_data:    SymbolData,
     latest_bar_index:       usize
 }
@@ -25,7 +25,7 @@ impl HistoricDataHandler {
             symbol: cfg.symbol.clone(),
             all_symbol_data,
             current_symbol_data: SymbolData::default(),
-            latest_bar_index: 0, // Todo: Fix implications of this, but it's the right thing to do
+            latest_bar_index: 0, // Todo: This should be -1, work out fix.
         }
     }
 
