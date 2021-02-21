@@ -21,10 +21,26 @@ pub struct Engine {
     exchanges:      Vec<String>,
 }
 
+#[derive(Debug)]
+pub struct Trader {
+    // Todo: Add logger
+    // ticker symbol this instance of Trader is using
+    pub symbol:              String,
+    // interval between bars this instance of Trader is using
+    pub timeframe:           String,
+    // name of the exchange this instance of Trader is using
+    pub exchange:            String,
+    // starting capital allocated to this instance of Trader
+    pub starting_cash:       f64,
+    // default value used by the SizeManager to determine the quantity of an order
+    pub default_order_value: f64,
+}
+
 pub fn load_config() -> Config {
     // Todo:
     //  - Add validation function for the passed config
     //  - Do I return a Result<Config> or not? Handle errors or propagate with '?' ?
+    //  - Extract methods where applicable
 
     // Extract ACTIVE_PROFILE environment variable
     let active_profile = match env::var(ACTIVE_PROFILE) {
@@ -37,7 +53,7 @@ pub fn load_config() -> Config {
     let mut reader = match File::open(file_path) {
         // Ok(file) => file,
         Ok(config_file) => BufReader::new(config_file),
-        Err(error) => panic!("failed to open file: {:?}", error)
+        Err(error) => panic!("failed to open file: {}", error)
     };
 
     // Read in config file contents to String
