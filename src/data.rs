@@ -1,6 +1,5 @@
 use crate::model::{SymbolData, Bar, MarketEvent, EVENT_TYPE_MARKET};
-use crate::config::{Config, Trader};
-use std::error::Error;
+use crate::config::{Trader};
 
 const DATA_DIRECTORY: &str = "resources/data/";
 
@@ -13,7 +12,7 @@ pub struct HistoricDataHandler {
 }
 
 impl HistoricDataHandler {
-    fn new(cfg: Trader, event_q: Vec<MarketEvent>) -> HistoricDataHandler {
+    pub fn new(cfg: &Trader, event_q: Vec<MarketEvent>) -> HistoricDataHandler {
         // Todo: log debug file path
         // Todo: Improve error handling, pass back to main with added info like Go? errors.wrap()
         let all_symbol_data = match load_csv_symbol_data(cfg) {
@@ -21,19 +20,23 @@ impl HistoricDataHandler {
             Err(err) => panic!("{}", err)
         };
 
-
-
-
+        HistoricDataHandler{
+            event_q,
+            symbol: cfg.symbol.clone(),
+            all_symbol_data,
+            current_symbol_data: SymbolData::default(),
+            latest_bar_index: 0, // Todo: Fix implications of this, but it's the right thing to do
+        }
     }
 
-    fn should_continue(&self) -> bool {
+    pub fn should_continue(&self) -> bool {
         // Return true if the next latest_bar_index has Some data instead of None
         self.all_symbol_data.timestamps
             .get(self.latest_bar_index + 1)
             .is_some()
     }
 
-    fn update_data(&mut self) {
+    pub fn update_data(&mut self) {
         // Increment latest_bar_index
         self.latest_bar_index += 1;
 
@@ -58,13 +61,13 @@ impl HistoricDataHandler {
         });
     }
 
-    fn get_latest_data(&self) -> (&SymbolData, usize) {
+    pub fn get_latest_data(&self) -> (&SymbolData, usize) {
         (&self.current_symbol_data, self.latest_bar_index)
     }
 }
 
 // Todo: Move func to lib?
-fn load_csv_symbol_data(&cfg: Trader) -> Result<SymbolData, csv::Error> {
+fn load_csv_symbol_data(cfg: &Trader) -> Result<SymbolData, csv::Error> {
     // Read the file
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(true)
@@ -82,6 +85,6 @@ fn load_csv_symbol_data(&cfg: Trader) -> Result<SymbolData, csv::Error> {
 }
 
 // Todo: Move func to lib?
-fn build_csv_file_path(&cfg: Trader) -> String {
+fn build_csv_file_path(cfg: &Trader) -> String {
     format!("{}{}_{}.csv", DATA_DIRECTORY, cfg.symbol, cfg.timeframe)
 }
